@@ -1,0 +1,59 @@
+@model IEnumerable<Assessment_Management_System.Models.Assessment>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @if (await AuthorizationService.AuthorizeAsync(User, "teacher"))
+    {
+        <a asp-action="Create">Create New</a>
+    }
+    
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                @if (await AuthorizationService.AuthorizeAsync(User, "teacher"))
+                {
+                    @: | 
+                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> @:| 
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                } else if (await AuthorizationService.AuthorizeAsync(User, "student"))
+                {
+                    <a asp-action="" asp-route-id="">Submit Assignment</a>
+                }
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
