@@ -35,5 +35,10 @@
     {
         <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> @:|
     }
+    else if (await AuthorizationService.AuthorizeAsync(User, "student"))
+    {
+        <a asp-action="" asp-route-id="">Submit Assignment</a>
+    }
+    <br /><br />
     <a asp-action="Index">Back to List</a>
 </div>

@@ -52,7 +52,7 @@ namespace Assessment_Management_System
                 //options.AddPolicy("RequireRestrictedAccess", policy => policy.RequireRole("admin", "teacher"));
                 options.AddPolicy("admin", policy => policy.RequireRole("admin"));
                 options.AddPolicy("teacher", policy => policy.RequireRole("teacher"));
-                options.AddPolicy("student", policy => policy.RequireRole("studet"));
+                options.AddPolicy("student", policy => policy.RequireRole("student"));
             });
 
             services.AddMvc();
