@@ -20,12 +20,9 @@
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.DueDate)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -33,9 +30,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DueDate)
@@ -47,9 +41,6 @@
                     @: | 
                     <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> @:| 
                     <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-                } else if (await AuthorizationService.AuthorizeAsync(User, "student"))
-                {
-                    <a asp-action="" asp-route-id="">Submit Assignment</a>
                 }
 
             </td>
