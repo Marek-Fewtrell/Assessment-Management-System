@@ -24,5 +24,7 @@ namespace Assessment_Management_System.Data
         }
 
         public DbSet<Assessment> Assessment { get; set; }
+
+        public DbSet<Submission> Submission { get; set; }
     }
 }

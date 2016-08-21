@@ -37,7 +37,7 @@
     }
     else if (await AuthorizationService.AuthorizeAsync(User, "student"))
     {
-        <a asp-action="" asp-route-id="">Submit Assignment</a>
+        <a asp-controller="Submissions" asp-action="Create" asp-route-id="@Model.ID">Submit Assignment</a>
     }
     <br /><br />
     <a asp-action="Index">Back to List</a>
