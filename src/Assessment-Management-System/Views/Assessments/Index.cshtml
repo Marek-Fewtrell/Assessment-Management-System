@@ -1,4 +1,5 @@
 @model IEnumerable<Assessment_Management_System.Models.Assessment>
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Index";
@@ -22,6 +23,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.DueDate)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationUser.UserName)
+            </th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -35,12 +39,26 @@
                 @Html.DisplayFor(modelItem => item.DueDate)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.ApplicationUser.UserName)
+            </td>
+            <td>
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                
+                @if (await AuthorizationService.AuthorizeAsync(User, "student"))
+                {
+                    @: |
+                    <a asp-action="Create" asp-controller="Submissions" asp-route-id="@item.ID">Submit Assessment</a>
+                }
                 @if (await AuthorizationService.AuthorizeAsync(User, "teacher"))
                 {
-                    @: | 
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> @:| 
-                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    if (UserManager.GetUserId(User) == item.teacherID)
+                    {
+                        @: |
+                        <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> 
+                        @:|
+                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    }
+
                 }
 
             </td>

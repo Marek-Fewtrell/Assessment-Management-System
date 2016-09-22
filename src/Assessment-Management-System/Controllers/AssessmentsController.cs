@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Assessment_Management_System.Data;
 using Assessment_Management_System.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Assessment_Management_System.Controllers
 {
@@ -15,16 +17,33 @@ namespace Assessment_Management_System.Controllers
     public class AssessmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _manager;
 
-        public AssessmentsController(ApplicationDbContext context)
+        public AssessmentsController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
         {
-            _context = context;    
+            _context = context;
+            _manager = manager;
         }
 
         // GET: Assessments
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Assessment.ToListAsync());
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            IQueryable<Assessment> applicationDbContext;
+            
+            //if teacher
+            if (await _manager.IsInRoleAsync(user, "teacher"))
+            {
+                //applicationDbContext = _context.Assessment.Include(a => a.ApplicationUser).Where(a => a.teacherID == user.Id);
+                applicationDbContext = _context.Assessment.Include(a => a.ApplicationUser);
+            }
+            else
+            {
+                //if student
+                applicationDbContext = _context.Assessment.Include(a => a.ApplicationUser);
+            }
+
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Assessments/Details/5
@@ -35,7 +54,7 @@ namespace Assessment_Management_System.Controllers
                 return NotFound();
             }
 
-            var assessment = await _context.Assessment.SingleOrDefaultAsync(m => m.ID == id);
+            var assessment = await _context.Assessment.Include(a=> a.ApplicationUser).SingleOrDefaultAsync(m => m.ID == id);
             if (assessment == null)
             {
                 return NotFound();
@@ -61,6 +80,8 @@ namespace Assessment_Management_System.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = await _manager.GetUserAsync(HttpContext.User);
+                assessment.teacherID = user.Id;
                 _context.Add(assessment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
