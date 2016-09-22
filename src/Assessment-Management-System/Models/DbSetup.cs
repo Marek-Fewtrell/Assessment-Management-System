@@ -21,8 +21,11 @@ namespace Assessment_Management_System.Models
                 RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 createRoles(roleManager);
                 seedAssessments(context);
+
                 seedUsers(context, userManager, "student@email.com", "Student1!", "student");
-                seedUsers(context, userManager, "teacher@email.com", "Teacher1!", "tutor");
+                seedUsers(context, userManager, "student2@email.com", "Student1!", "student");
+                seedUsers(context, userManager, "teacher@email.com", "Teacher1!", "teacher");
+                seedUsers(context, userManager, "teacher2@email.com", "Teacher1!", "teacher");
             }
         }
 

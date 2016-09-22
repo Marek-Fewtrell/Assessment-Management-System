@@ -10,5 +10,6 @@ namespace Assessment_Management_System.Models
     public class ApplicationUser : IdentityUser
     {
         public virtual ICollection<Submission> AssessmentSubmissions { get; set; }
+        public virtual ICollection<Assessment> Assessments { get; set; }
     }
 }
