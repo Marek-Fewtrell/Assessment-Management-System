@@ -1,4 +1,5 @@
 @model IEnumerable<Assessment_Management_System.Models.Submission>
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Index";
@@ -21,6 +22,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.submittedOn)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationUser.UserName)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -37,9 +41,29 @@
                 @Html.DisplayFor(modelItem => item.submittedOn)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                @Html.DisplayFor(modelItem => item.ApplicationUser.UserName)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+
+                @if (await AuthorizationService.AuthorizeAsync(User, "student"))
+                {
+                    @: |
+                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
+                    @: |
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                }
+
+                @if (await AuthorizationService.AuthorizeAsync(User, "teacher"))
+                {
+                    if (UserManager.GetUserId(User) == item.Assessment.teacherID)
+                    {
+                        @: |
+                        <a asp-action="Download" asp-route-id="@item.ID">Download File</a>
+                    }
+
+                }
+
             </td>
         </tr>
 }
