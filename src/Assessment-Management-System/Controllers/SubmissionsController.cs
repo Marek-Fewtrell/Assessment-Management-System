@@ -31,7 +31,21 @@ namespace Assessment_Management_System.Controllers
         // GET: Submissions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Submission.Include(s => s.Assessment).ToListAsync());
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            IQueryable<Submission> applicationDbContext;
+
+            if (await _manager.IsInRoleAsync(user, "teacher"))
+            {
+                applicationDbContext = _context.Submission.Include(a => a.ApplicationUser).Include(s => s.Assessment);
+            }
+            else
+            {
+                //if student
+                applicationDbContext = _context.Submission.Include(s => s.Assessment).Include(a => a.ApplicationUser).Where(a => a.studentID == user.Id);
+            }
+
+            return View(await applicationDbContext.ToListAsync());
+
         }
 
         // GET: Submissions/Details/5
@@ -119,12 +133,12 @@ namespace Assessment_Management_System.Controllers
                 return NotFound();
             }
 
-            var submission = await _context.Submission.SingleOrDefaultAsync(m => m.ID == id);
+            var submission = await _context.Submission.Include(a => a.Assessment).SingleOrDefaultAsync(m => m.ID == id);
             if (submission == null)
             {
                 return NotFound();
             }
-            ViewData["AssessmentID"] = new SelectList(_context.Assessment, "ID", "Title", id);
+            //ViewData["AssessmentID"] = new SelectList(_context.Assessment, "ID", "Title", id);
             return View(submission);
         }
 
@@ -155,6 +169,8 @@ namespace Assessment_Management_System.Controllers
                             await file.CopyToAsync(fileStream);
                         }
                     }
+
+                    submission.fileName = file.FileName;
 
                     _context.Update(submission);
                     await _context.SaveChangesAsync();
@@ -212,6 +228,20 @@ namespace Assessment_Management_System.Controllers
         private bool SubmissionExists(int id)
         {
             return _context.Submission.Any(e => e.ID == id);
+        }
+
+        public async Task<FileContentResult> Download(int? id)
+        {
+            var submission = await _context.Submission.SingleOrDefaultAsync(m => m.ID == id);
+            /*var fileName = submission.storageFileName;
+            var filepath = "~/wwwroot/uploads/"+fileName;*/
+
+            var fileName = submission.storageFileName;
+            var uploads = Path.Combine(_environment.WebRootPath, "uploads");
+            var filepath = Path.Combine(uploads, fileName);
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filepath);
+            return File(fileBytes, "application/x-msdownload", submission.fileName);
         }
     }
 }

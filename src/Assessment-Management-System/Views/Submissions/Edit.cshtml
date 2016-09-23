@@ -14,19 +14,28 @@
         <input type="hidden" asp-for="ID" />
         <input type="hidden" asp-for="storageFileName" />
         <input type="hidden" asp-for="studentID" />
+        <input type="hidden" asp-for="AssessmentID" />
+        <input type="hidden" asp-for="fileName" />
+
         <div class="form-group">
-            <label asp-for="AssessmentID" class="col-md-2 control-label"></label>
+            <label asp-for="Assessment" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="AssessmentID" class="form-control" asp-items="ViewBag.AssessmentID"></select>
+                <!--<select asp-for="AssessmentID" class="form-control" asp-items="ViewBag.AssessmentID"></select>-->
+                @Model.Assessment.Title
             </div>
         </div>
+
+        <h4>Previous Submission</h4>
         <div class="form-group">
             <label asp-for="fileName" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="fileName" class="form-control" />
+                <!--<input asp-for="fileName" class="form-control" />-->
+                @Model.fileName
                 <span asp-validation-for="fileName" class="text-danger" />
             </div>
         </div>
+
+        <h4>New Submission</h4>
         <div class="form-group">
             <label name="file" class="col-md-2 control-label">New File</label>
             <div class="col-md-10">
