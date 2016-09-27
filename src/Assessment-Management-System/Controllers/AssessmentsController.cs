@@ -98,7 +98,15 @@ namespace Assessment_Management_System.Controllers
                 return NotFound();
             }
 
+            var user = await _manager.GetUserAsync(HttpContext.User);
+
             var assessment = await _context.Assessment.SingleOrDefaultAsync(m => m.ID == id);
+
+            if (user.Id != assessment.teacherID)
+            {
+                return RedirectToAction("Index");
+            }
+
             if (assessment == null)
             {
                 return NotFound();
@@ -117,6 +125,12 @@ namespace Assessment_Management_System.Controllers
             if (id != assessment.ID)
             {
                 return NotFound();
+            }
+
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != assessment.teacherID)
+            {
+                return RedirectToAction("Index");
             }
 
             if (ModelState.IsValid)
@@ -152,6 +166,13 @@ namespace Assessment_Management_System.Controllers
             }
 
             var assessment = await _context.Assessment.SingleOrDefaultAsync(m => m.ID == id);
+
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != assessment.teacherID)
+            {
+                return RedirectToAction("Index");
+            }
+
             if (assessment == null)
             {
                 return NotFound();
@@ -167,6 +188,12 @@ namespace Assessment_Management_System.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var assessment = await _context.Assessment.SingleOrDefaultAsync(m => m.ID == id);
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != assessment.teacherID)
+            {
+                return RedirectToAction("Index");
+            }
+
             _context.Assessment.Remove(assessment);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
