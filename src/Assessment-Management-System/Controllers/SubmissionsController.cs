@@ -66,6 +66,7 @@ namespace Assessment_Management_System.Controllers
         }
 
         // GET: Submissions/Create
+        [Authorize(Roles = "student")]
         public async Task<IActionResult> Create(int? id)
         {
             var user = await _manager.GetUserAsync(HttpContext.User);
@@ -75,7 +76,12 @@ namespace Assessment_Management_System.Controllers
                 return RedirectToAction("Edit", "Submissions", new { id = result.ID });
             }
 
-            ViewData["AssessmentID"] = new SelectList(_context.Assessment, "ID", "Title", id);
+            if (id != null)
+            {
+                var assessmentSelected = await _context.Assessment.FirstOrDefaultAsync(a => a.ID == id);
+                ViewData["assessmentSelected"] = assessmentSelected;
+            }
+            //ViewData["AssessmentID"] = new SelectList(_context.Assessment, "ID", "Title", id);
             return View();
         }
 
@@ -84,6 +90,7 @@ namespace Assessment_Management_System.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "student")]
         public async Task<IActionResult> Create([Bind("AssessmentID")]Submission submission, IFormFile file) /*[Bind("ID,fileName,submittedOn")]*/
         {
             if (ModelState.IsValid)
@@ -126,6 +133,7 @@ namespace Assessment_Management_System.Controllers
         }
 
         // GET: Submissions/Edit/5
+        [Authorize(Roles = "student")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -134,6 +142,13 @@ namespace Assessment_Management_System.Controllers
             }
 
             var submission = await _context.Submission.Include(a => a.Assessment).SingleOrDefaultAsync(m => m.ID == id);
+
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != submission.studentID)
+            {
+                return RedirectToAction("Index");
+            }
+
             if (submission == null)
             {
                 return NotFound();
@@ -147,11 +162,18 @@ namespace Assessment_Management_System.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "student")]
         public async Task<IActionResult> Edit(int id, [Bind("ID,fileName,AssessmentID,storageFileName,studentID")] Submission submission, IFormFile file)
         {
             if (id != submission.ID)
             {
                 return NotFound();
+            }
+
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != submission.studentID)
+            {
+                return RedirectToAction("Index");
             }
 
             if (ModelState.IsValid)
@@ -193,6 +215,7 @@ namespace Assessment_Management_System.Controllers
         }
 
         // GET: Submissions/Delete/5
+        [Authorize(Roles = "student")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -201,6 +224,13 @@ namespace Assessment_Management_System.Controllers
             }
 
             var submission = await _context.Submission.SingleOrDefaultAsync(m => m.ID == id);
+
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != submission.studentID)
+            {
+                return RedirectToAction("Index");
+            }
+
             if (submission == null)
             {
                 return NotFound();
@@ -212,9 +242,16 @@ namespace Assessment_Management_System.Controllers
         // POST: Submissions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "student")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var submission = await _context.Submission.SingleOrDefaultAsync(m => m.ID == id);
+
+            var user = await _manager.GetUserAsync(HttpContext.User);
+            if (user.Id != submission.studentID)
+            {
+                return RedirectToAction("Index");
+            }
 
             var uploads = Path.Combine(_environment.WebRootPath, "uploads");
             var path = Path.Combine(uploads, submission.storageFileName);
