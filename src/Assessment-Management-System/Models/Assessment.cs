@@ -10,8 +10,10 @@ namespace Assessment_Management_System.Models
         public int ID { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+        [Display(Name = "Due Date")]
         [DisplayFormat(DataFormatString = "{0:hh:mm tt dddd dd MMMM yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DueDate { get; set; }
+        [Display(Name = "Teacher ID")]
         [ForeignKey("ApplicationUser")]
         public string teacherID { get; set; }
 
