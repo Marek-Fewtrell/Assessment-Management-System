@@ -22,6 +22,23 @@
         </dt>
         <dd>
             @Html.DisplayFor(model => model.fileName)
+            @if (await AuthorizationService.AuthorizeAsync(User, "student"))
+            {
+                if (UserManager.GetUserId(User) == Model.studentID)
+                {
+                    <a asp-action="Download" asp-route-id="@Model.ID">Download File</a>
+                }
+
+            }
+            else
+            {
+                if (UserManager.GetUserId(User) == Model.Assessment.teacherID)
+                {
+                    <a asp-action="Download" asp-route-id="@Model.ID">Download File</a>
+
+                }
+
+            }
         </dd>
 
         <dt>
